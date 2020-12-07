@@ -6,20 +6,21 @@ import Land from "../land/land"
 import Controls from "../controls/controls"
 import Header from "./header"
 
-var contract = require("@truffle/contract");
 let web3;
 let _instance;
 let RaribleContract;
+var contract = require("@truffle/contract");
 
 
 function Canvas() {
 
-    const [buttonVisibility, setButtonVisibility] = useState("") 
+    const [buttonVisibility, setButtonVisibility] = useState(false) 
     let [Rarible, setRarible] = useState(null)
     let [accounts, setAccounts] = useState([])
-    let [_pos, setPosition] = useState("00")
+    let [_pos, setPosition] = useState("30")
     let [instance, setInstance] = useState(null)
     let [ready, setReadiness] = useState(false)
+    let [items, setItems] = useState([])
 
     useEffect(() => {
         initMetaMask()
@@ -35,15 +36,18 @@ function Canvas() {
 
     useEffect(() => {
         if(accounts.length === 0) {
-            setButtonVisibility("initial")
+            setButtonVisibility(false)
         } else {
-            setButtonVisibility("hidden")
+            setButtonVisibility(true)
         }
     }, [accounts])
 
     useEffect(() => {
-        console.log(instance, ready)
     }, [Rarible, instance])
+
+    const _getItems = _items => {
+        setItems(_items)
+    }
 
     const superiorSetPosition = _position => {
         setPosition(_position)
@@ -54,7 +58,6 @@ function Canvas() {
         {mode: 'cors'})
         .then(res => res.json())
         .then(result => {
-            console.log(result)
             setRarible(result)
         })
     }
@@ -91,7 +94,7 @@ function Canvas() {
         let _accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setAccounts(_accounts)
         setReadiness(true)
-        setButtonVisibility("none")
+        setButtonVisibility(true)
     }
 
     const _getURI = tokenID => {
@@ -109,17 +112,21 @@ function Canvas() {
     
     return(
         <div className="canvas">
-            <div className="canvas-header" style={{overflow: buttonVisibility}}>
-                <Header 
-                args={buttonVisibility} 
-                enableMetamask={enableMetamask}/>
-            </div>
+            <Header enableMetamask={enableMetamask} 
+            buttonVisibility={buttonVisibility}/>
+
             <div className="playground">
                 <Controls position={_pos} changePosition={superiorSetPosition}/>
-                <Land len={8} position={_pos} />
+                <Land len={8} position={_pos} items={items}/>
             </div>
             <ItemsContainer 
-            args={{getURI: _getURI, balanceOf: _BalanceOf}}
+            args={
+                {
+                    getURI: _getURI, 
+                    balanceOf: _BalanceOf,
+                    getItems: _getItems
+                }
+            }
             ready={ready}
             instance={instance}/>
         </div>
