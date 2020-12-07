@@ -1,5 +1,4 @@
 import React, {useEffect} from "react";
-import Columns from "./columns";
 
 let rows = [];
 
