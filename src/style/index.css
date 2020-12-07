@@ -34,21 +34,14 @@ code {
 
 .one-card {
   border: 1px solid black;
-  margin-right: 50px;
-  padding: 10px;
-  margin: 10px;
+  margin: 5px;
 }
 
 .square {
   width: 30px;
   height: 30px;
-  border: 1px solid black;
   padding: 1px;
   margin: 5px;
-}
-
-.square:hover {
-  background-color: #FF9400;
 }
 
 .cards{
@@ -97,6 +90,14 @@ code {
   border: 2px solid black;
 }
 
+.button-submit-blocked{
+  height: 35px;
+  position: absolute;
+  right: 15px;
+  color: grey;
+  border: 2px solid grey;
+}
+
 .button-maze {
   width:90%;
   height:90%;
@@ -113,4 +114,5 @@ button {
   display: inline-block;
   margin: 4px 2px;
   cursor: pointer;
+  border-radius: 5px;
 }
