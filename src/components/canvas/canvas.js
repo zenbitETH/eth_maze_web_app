@@ -8,16 +8,18 @@ import Header from "./header"
 
 var contract = require("@truffle/contract");
 let web3;
-let instance;
+let _instance;
 let RaribleContract;
 
 
 function Canvas() {
 
     const [buttonVisibility, setButtonVisibility] = useState("") 
-    const [Rarible, setRarible] = useState(null)
+    let [Rarible, setRarible] = useState(null)
     let [accounts, setAccounts] = useState([])
     let [_pos, setPosition] = useState("00")
+    let [instance, setInstance] = useState(null)
+    let [ready, setReadiness] = useState(false)
 
     useEffect(() => {
         initMetaMask()
@@ -28,12 +30,20 @@ function Canvas() {
     }, [])
 
     useEffect(() => {
+        setContract()
+    }, [Rarible])
+
+    useEffect(() => {
         if(accounts.length === 0) {
             setButtonVisibility("initial")
         } else {
             setButtonVisibility("hidden")
         }
     }, [accounts])
+
+    useEffect(() => {
+        console.log(instance, ready)
+    }, [Rarible, instance])
 
     const superiorSetPosition = _position => {
         setPosition(_position)
@@ -44,6 +54,7 @@ function Canvas() {
         {mode: 'cors'})
         .then(res => res.json())
         .then(result => {
+            console.log(result)
             setRarible(result)
         })
     }
@@ -67,34 +78,35 @@ function Canvas() {
         }
     }
 
-    const initComponent = async () => {
-        
-        let walletExists = initMetaMask()
-        if (!walletExists) {
-            return null
-        } 
-        web3.eth.getAccounts().then(accnts => {
-            setAccounts(accnts)
-        })
-
+    const setContract = async () => {
         RaribleContract = contract({abi: Rarible.abi})
         RaribleContract.setProvider(web3.currentProvider)
-        instance = await RaribleContract.at(
+        _instance = await RaribleContract.at(
             Rarible.address
         )
-        let stuff = await instance.uri(77159, {from: accounts[0]})
-        let resp = await (await (await fetch(stuff)).json())
-
-        return 
+        setInstance(_instance)
     }
                     
     const enableMetamask = async () => {
         let _accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setAccounts(_accounts)
+        setReadiness(true)
         setButtonVisibility("none")
-        await initComponent()
     }
 
+    const _getURI = tokenID => {
+        if(instance == null || accounts.length === 0) {
+            return new Promise((resolve, reject) => {
+                resolve("")
+            })
+        }
+        return instance.uri(tokenID)
+    }
+
+    const _BalanceOf = tokenID => {
+        return instance.balanceOf(accounts[0], tokenID)
+    }
+    
     return(
         <div className="canvas">
             <div className="canvas-header" style={{overflow: buttonVisibility}}>
@@ -106,7 +118,10 @@ function Canvas() {
                 <Controls position={_pos} changePosition={superiorSetPosition}/>
                 <Land len={8} position={_pos} />
             </div>
-            <ItemsContainer />
+            <ItemsContainer 
+            args={{getURI: _getURI, balanceOf: _BalanceOf}}
+            ready={ready}
+            instance={instance}/>
         </div>
     )
 }
