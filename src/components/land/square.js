@@ -2,15 +2,24 @@ import React, { useEffect } from "react"
 
 
 function Square(props) {
-
-    let squareStyle = {
-        backgroundColor: isSelected(props.isSelected)
-    }
     
+    let squareStyle = {
+        border: isVisible(props.isVisible),
+        backgroundColor: isSelected(props.isSelected),
+    }
+
     return(
         <div className="square" style={squareStyle}>
         </div>
     )
+}
+
+const isVisible = _isVisible => {
+    if(_isVisible) {
+        return "1px solid black"
+    } else {
+        return "1px solid white"
+    }
 }
 
 const isSelected = selected => {
