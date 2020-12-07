@@ -1,22 +1,34 @@
-import React from "react"
-
+import React, {useEffect} from "react"
+import {grid} from "../land/grid"
 
 function Controls(props) {
 
-    let args = props;
-    let position = [parseInt(props.position[0]), parseInt(props.position[1])]
     const move = eve => {
 
+        let args = props;
+        let oldPosition = [parseInt(props.position[0]), 
+                           parseInt(props.position[1])]
+    
+        let tempPosition = oldPosition
+        let newPosition = oldPosition[0] + "" + oldPosition[1]
+
         if (eve.target.id == 1) {
-            position[1] = position[1] + 1
+            tempPosition[1] = tempPosition[1] + 1
         }
-        else if (eve.target.id == 2) {
-            position[0] = position[0] + 1
+        else if (eve.target.id == 2 && tempPosition[1] > 0) {
+            tempPosition[1] = tempPosition[1] - 1
         }
-        else {
-            position[0] = position[0] - 1
+        else if (eve.target.id == 3 && tempPosition[0] > 0) {
+            tempPosition[0] = tempPosition[0] - 1
         }
-        args.changePosition(position[0] + "" + position[1])
+        else if (eve.target.id == 4) {
+            tempPosition[0] = tempPosition[0] + 1
+        }
+
+        if(grid[tempPosition[0]][tempPosition[1]] !== 0) {
+            newPosition = tempPosition[0] + "" + tempPosition[1]
+        }
+        args.changePosition(newPosition)
     } 
 
     return(
@@ -34,12 +46,20 @@ function Controls(props) {
                 id="2" 
                 onClick={move}
                 className="button-maze">
-                    Move up
+                    Move left
                 </button>
             </div>
             <div className="button-container">
                 <button 
                 id="3" 
+                onClick={move}
+                className="button-maze">
+                    Move up
+                </button>
+            </div>
+            <div className="button-container">
+                <button 
+                id="4" 
                 onClick={move}
                 className="button-maze">
                     Move down
