@@ -16,9 +16,9 @@ function Square(props) {
 
 const isVisible = _isVisible => {
     if(_isVisible) {
-        return "1px solid black"
-    } else {
         return "1px solid white"
+    } else {
+        return "1px white"
     }
 }
 
