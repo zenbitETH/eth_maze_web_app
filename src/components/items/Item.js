@@ -4,12 +4,13 @@ function Item(props) {
 
     let [uri, setURI] = useState("")
     let [NFTObject, setNFTObject] = useState({
-            image: "loading.gif",
+            image: "void.gif",
             description: "",
             name: "",
         })
     let [balance, setBalance] = useState(0)
-
+    
+    // First we get balance of selected address and tokens id.
     useEffect(() => {
         const balanceOf = async () => {
             let balance = await props.args.balanceOf(props.id)
@@ -18,18 +19,23 @@ function Item(props) {
         balanceOf().then(_balance => {
             setBalance(_balance)
         })
-    }, [props.instance])
+    }, [props.instance, props.ready])
 
+    //Once balance is set we call the rarible smart contract to get the token URI
     useEffect(() => {
         const getURI = async () => {
             let _uri = await props.args.getURI(props.id)
             return _uri
         }
         getURI().then(res => {
-            setURI(res)
+            if(balance !== 0) {
+                setURI(res)
+            }
+            
         })
-    }, [balance, props.ready])
+    }, [balance])
 
+    // Finally token object is called 
     useEffect(() => {
         fetchIPFSObject()
     }, [uri])
@@ -54,19 +60,12 @@ function Item(props) {
 
     return(
         <div 
-        className="one-card">
-            {
-            balance === 0 && !props.ready ?
-            <span>
-                User does not have item
-            </span>
-            :
+        className="one-card item">
             <img
+                width="100%"
                 src={NFTObject.image}
-                width="130" height="130"
                 alt={NFTObject.description}>
             </img> 
-            }
         </div>
     )
 }
