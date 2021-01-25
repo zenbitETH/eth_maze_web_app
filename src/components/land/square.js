@@ -18,7 +18,7 @@ const isVisible = _isVisible => {
     if(_isVisible) {
         return "1px solid white"
     } else {
-        return "1px white"
+        return "1px solid transparent"
     }
 }
 
@@ -26,7 +26,7 @@ const isSelected = selected => {
     if(selected){
         return "#FF9400"
     }
-    return
+    return 
 }
 
 export default Square
