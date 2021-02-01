@@ -29,9 +29,9 @@ function Item(props) {
         }
         getURI().then(res => {
             if(balance !== 0) {
+                props.args.getItems(props.maskedKey)
                 setURI(res)
             }
-            
         })
     }, [balance])
 
