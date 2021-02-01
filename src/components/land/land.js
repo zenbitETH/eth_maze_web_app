@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import Square from "./square"
 import Rows from "./rows"
-import {grid} from "./grid"
+import {grid, rules} from "./grid"
 
 function Land(props) {
 
