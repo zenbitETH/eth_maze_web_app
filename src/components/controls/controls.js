@@ -1,10 +1,14 @@
 import React, {useEffect} from "react"
+import Button from "./button"
+import ButtonContainer from "./buttonContainer"
 import {grid} from "../land/grid"
 
 function Controls(props) {
 
     const move = eve => {
-
+        if(!props.canContinue) {
+            return
+        }
         let args = props;
         let oldPosition = [parseInt(props.position[0]), 
                            parseInt(props.position[1])]
@@ -15,7 +19,7 @@ function Controls(props) {
         if (eve.target.id == 1) {
             tempPosition[1] = tempPosition[1] + 1
         }
-        else if (eve.target.id == 2 && tempPosition[1] > 0) {
+        else if (eve.target.id == 2 && tempPosition[1] > 1) {
             tempPosition[1] = tempPosition[1] - 1
         }
         else if (eve.target.id == 3 && tempPosition[0] > 0) {
@@ -29,42 +33,27 @@ function Controls(props) {
             newPosition = tempPosition[0] + "" + tempPosition[1]
         }
         args.changePosition(newPosition)
-    } 
+        args.changeStage(grid[newPosition[0]][newPosition[1]])
+    }
 
     return(
         <div className="controls">
-            <div className="button-container">
-                <button
-                id="1" 
-                onClick={move}
-                className="button-maze">
-                    Move right
-                </button>
-            </div>
-            <div className="button-container">
-                <button 
-                id="2" 
-                onClick={move}
-                className="button-maze">
-                    Move left
-                </button>
-            </div>
-            <div className="button-container">
-                <button 
-                id="3" 
-                onClick={move}
-                className="button-maze">
-                    Move up
-                </button>
-            </div>
-            <div className="button-container">
-                <button 
-                id="4" 
-                onClick={move}
-                className="button-maze">
-                    Move down
-                </button>
-            </div>
+            <ButtonContainer>
+                <Button
+                    id={2}
+                    data={{
+                        move: move,
+                        message: "Move left"
+                    }}
+                />
+                <Button
+                    id={1}
+                    data={{
+                        move: move,
+                        message: "Move right"
+                    }}
+                />
+            </ButtonContainer>
         </div>
     )
 }
