@@ -5,23 +5,29 @@ import "../../style/index.css"
 import Land from "../land/land"
 import Controls from "../controls/controls"
 import Header from "./header"
+import Ground from "../ground/ground"
+import {url, changeBodyStyle} from "./background"
 
 let web3;
 let _instance;
 let RaribleContract;
-var contract = require("@truffle/contract");
 
+var contract = require("@truffle/contract");
 
 function Canvas() {
 
     const [buttonVisibility, setButtonVisibility] = useState(false) 
+    let [canContinue, setContinuation] = useState(true)
     let [Rarible, setRarible] = useState(null)
     let [accounts, setAccounts] = useState([])
-    let [_pos, setPosition] = useState("30")
-    let [instance, setInstance] = useState(null)
+    let [_pos, setPosition] = useState("31")
+    let [instanceRe, setInstance] = useState(null)
     let [ready, setReadiness] = useState(false)
-    let [items, setItems] = useState([])
+    let [items, setItems] = useState({})
+    let [arrayItems, setArray] = useState([])
 
+
+    // Initialize wallets and get accounts if connected, fetch Rarible json
     useEffect(() => {
         initMetaMask()
         web3.eth.getAccounts().then(accnts => {
@@ -30,10 +36,12 @@ function Canvas() {
         fetchRaribleJSON()
     }, [])
 
+    // Once the Rarible json is fetched the contract variable is initialized
     useEffect(() => {
         setContract()
     }, [Rarible])
 
+    // Edit metamask button if accounts are already available
     useEffect(() => {
         if(accounts.length === 0) {
             setButtonVisibility(false)
@@ -42,17 +50,28 @@ function Canvas() {
         }
     }, [accounts])
 
+    //
     useEffect(() => {
-    }, [Rarible, instance])
+    }, [Rarible, instanceRe])
 
-    const _getItems = _items => {
+    const changeContinuation = value => {
+        setContinuation(value)
+    }
+
+    // Function to set NFT items from contract. Passed to child component
+    const _getItems = item => {
+        items[item] = true
+        let _items = Object.assign({}, items)
         setItems(_items)
     }
 
+    // Function to set position from controls at parent state
     const superiorSetPosition = _position => {
         setPosition(_position)
+        changeBodyStyle(_position)
     }
 
+    // Fetch Rarible json from AWS
     const fetchRaribleJSON = () => {
         fetch("https://zenbit-util-contracts.s3.amazonaws.com/rarible.json",
         {mode: 'cors'})
@@ -62,6 +81,7 @@ function Canvas() {
         })
     }
 
+    // Function to check wether accounts are available or not
     const initMetaMask = () => {
         if (window.ethereum) {
             web3 = new Web3(window.ethereum)
@@ -81,6 +101,7 @@ function Canvas() {
         }
     }
 
+    // Function to set the contract instance and use web3 provided by metamask
     const setContract = async () => {
         RaribleContract = contract({abi: Rarible.abi})
         RaribleContract.setProvider(web3.currentProvider)
@@ -89,7 +110,8 @@ function Canvas() {
         )
         setInstance(_instance)
     }
-                    
+
+    // Function to enable Metamask when button is clicked
     const enableMetamask = async () => {
         let _accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setAccounts(_accounts)
@@ -97,38 +119,56 @@ function Canvas() {
         setButtonVisibility(true)
     }
 
+    // Function to return URI from token
     const _getURI = tokenID => {
-        if(instance == null || accounts.length === 0) {
+        if(instanceRe == null || accounts.length === 0) {
             return new Promise((resolve, reject) => {
                 resolve("")
             })
         }
-        return instance.uri(tokenID)
+        return instanceRe.uri(tokenID)
     }
 
+    // Function to get balance from account with fetched tokenID
     const _BalanceOf = tokenID => {
-        return instance.balanceOf(accounts[0], tokenID)
+        return instanceRe.balanceOf(accounts[0], tokenID)
     }
-    
+
     return(
         <div className="canvas">
-            <Header enableMetamask={enableMetamask} 
-            buttonVisibility={buttonVisibility}/>
-
+            <Header 
+                enableMetamask={enableMetamask} 
+                buttonVisibility={buttonVisibility}
+            />
             <div className="playground">
-                <Controls position={_pos} changePosition={superiorSetPosition}/>
-                <Land len={8} position={_pos} items={items}/>
+                <Controls
+                    totalItems={items.length}
+                    items={items}
+                    position={_pos}
+                    allowed={canContinue}
+                    changeAllowance={changeContinuation}
+                    changePosition={superiorSetPosition}
+                />
+                <Ground 
+                    position={_pos}
+                    changeAllowance={changeContinuation}
+                />
+                <Land 
+                    position={_pos}
+                    items={items}
+                />
             </div>
             <ItemsContainer 
-            args={
-                {
-                    getURI: _getURI, 
-                    balanceOf: _BalanceOf,
-                    getItems: _getItems
+                args={
+                    {
+                        getURI: _getURI, 
+                        balanceOf: _BalanceOf,
+                        getItems: _getItems
+                    }
                 }
-            }
-            ready={ready}
-            instance={instance}/>
+                ready={ready}
+                instance={instanceRe}
+            />
         </div>
     )
 }

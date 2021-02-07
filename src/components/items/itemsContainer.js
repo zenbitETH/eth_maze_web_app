@@ -7,7 +7,7 @@ const items = require("./items.json")
 function ItemsContainer(props) {
 
     const itemsMap = items.map(ele => {
-        return <Item id={ele.token_id} key={ele.id} 
+        return <Item id={ele.token_id} key={ele.id} maskedKey={ele.id}
         ready={props.ready} args={props.args} instance={props.instance}/>
     })
 
@@ -17,7 +17,5 @@ function ItemsContainer(props) {
         </div>
     )
 }
-
-
 
 export default ItemsContainer

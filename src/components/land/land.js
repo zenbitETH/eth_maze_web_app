@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import Square from "./square"
 import Rows from "./rows"
-import {grid} from "./grid"
+import {grid, rules} from "./grid"
 
 function Land(props) {
 
@@ -12,20 +12,23 @@ function Land(props) {
             let array1d = []
             for(var col = 0; col < grid[row].length; col++) {
                 let _square;
-                let isSelected = false
-                let isVisible = false;
-
+                let selected = false
+                let visibility = 0;
+                
                 if (position[0] === row && position[1] === col) {
-                    isSelected = true
+                    selected = 1
+                } else if(grid[row][col] < 0) {
+                    selected = -1
+                } else {
+                    selected = 0
                 }
-                if (grid[row][col] > 0) {
-                    isVisible = true
-                }
+                
+                visibility = grid[row][col]
 
                 _square = <Square 
                             key={row+""+col} 
-                            isSelected={isSelected}
-                            isVisible={isVisible}
+                            selected={selected}
+                            visibility={visibility}
                           />
                 array1d.push(_square)
             }

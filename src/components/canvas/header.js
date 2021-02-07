@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React from "react"
 
 
 function Header(props) {
@@ -8,15 +8,16 @@ function Header(props) {
     return(
 
         <div className="canvas-header" id="button-mm">
-                <button type="submit"
-                    disable={props.buttonVisibility}
-                    onClick={props.enableMetamask}
-                    className={_class}>
-                        Connect Metamask
-                </button>
+            
+            <img className="logo" src="aztec-logo.png"></img>
+            <button type="submit"
+                disable={props.buttonVisibility.toString()}
+                onClick={props.enableMetamask}
+                className={_class}>
+                    Connect Metamask
+            </button>
+            
         </div>
-
-        
     )
 }
 

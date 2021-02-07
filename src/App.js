@@ -1,5 +1,6 @@
 import React from "react"
 import Canvas from "./components/canvas/canvas"
+import "./style/index.css"
 
 function App() {
   return (
