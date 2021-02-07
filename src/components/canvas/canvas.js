@@ -6,24 +6,26 @@ import Land from "../land/land"
 import Controls from "../controls/controls"
 import Header from "./header"
 import Ground from "../ground/ground"
-import ModalLanding from "../modals/landing"
+import {url, changeBodyStyle} from "./background"
 
 let web3;
 let _instance;
 let RaribleContract;
-var contract = require("@truffle/contract");
 
+var contract = require("@truffle/contract");
 
 function Canvas() {
 
     const [buttonVisibility, setButtonVisibility] = useState(false) 
+    let [canContinue, setContinuation] = useState(true)
     let [Rarible, setRarible] = useState(null)
     let [accounts, setAccounts] = useState([])
-    let [_pos, setPosition] = useState("30")
-    let [instance, setInstance] = useState(null)
+    let [_pos, setPosition] = useState("31")
+    let [instanceRe, setInstance] = useState(null)
     let [ready, setReadiness] = useState(false)
-    let [items, setItems] = useState([])
-    let [gameInit, setGameInit] = useState(false)
+    let [items, setItems] = useState({})
+    let [arrayItems, setArray] = useState([])
+
 
     // Initialize wallets and get accounts if connected, fetch Rarible json
     useEffect(() => {
@@ -34,7 +36,7 @@ function Canvas() {
         fetchRaribleJSON()
     }, [])
 
-    // Once the Rarible json is fetched contrac variable is initialized
+    // Once the Rarible json is fetched the contract variable is initialized
     useEffect(() => {
         setContract()
     }, [Rarible])
@@ -50,16 +52,23 @@ function Canvas() {
 
     //
     useEffect(() => {
-    }, [Rarible, instance])
+    }, [Rarible, instanceRe])
+
+    const changeContinuation = value => {
+        setContinuation(value)
+    }
 
     // Function to set NFT items from contract. Passed to child component
-    const _getItems = _items => {
+    const _getItems = item => {
+        items[item] = true
+        let _items = Object.assign({}, items)
         setItems(_items)
     }
 
     // Function to set position from controls at parent state
     const superiorSetPosition = _position => {
         setPosition(_position)
+        changeBodyStyle(_position)
     }
 
     // Fetch Rarible json from AWS
@@ -106,40 +115,49 @@ function Canvas() {
     const enableMetamask = async () => {
         let _accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setAccounts(_accounts)
-
         setReadiness(true)
         setButtonVisibility(true)
     }
 
     // Function to return URI from token
     const _getURI = tokenID => {
-        if(instance == null || accounts.length === 0) {
+        if(instanceRe == null || accounts.length === 0) {
             return new Promise((resolve, reject) => {
                 resolve("")
             })
         }
-        return instance.uri(tokenID)
+        return instanceRe.uri(tokenID)
     }
 
     // Function to get balance from account with fetched tokenID
     const _BalanceOf = tokenID => {
-        return instance.balanceOf(accounts[0], tokenID)
+        return instanceRe.balanceOf(accounts[0], tokenID)
     }
 
     return(
         <div className="canvas">
-            
             <Header 
                 enableMetamask={enableMetamask} 
                 buttonVisibility={buttonVisibility}
             />
-
             <div className="playground">
-                <Controls position={_pos} changePosition={superiorSetPosition}/>
-                <Ground />
-                <Land position={_pos} items={items}/>
+                <Controls
+                    totalItems={items.length}
+                    items={items}
+                    position={_pos}
+                    allowed={canContinue}
+                    changeAllowance={changeContinuation}
+                    changePosition={superiorSetPosition}
+                />
+                <Ground 
+                    position={_pos}
+                    changeAllowance={changeContinuation}
+                />
+                <Land 
+                    position={_pos}
+                    items={items}
+                />
             </div>
-            <ModalLanding />
             <ItemsContainer 
                 args={
                     {
@@ -149,7 +167,7 @@ function Canvas() {
                     }
                 }
                 ready={ready}
-                instance={instance}
+                instance={instanceRe}
             />
         </div>
     )
