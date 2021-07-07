@@ -37,9 +37,9 @@ function Canvas() {
     }, [])
 
     // Once the Rarible json is fetched the contract variable is initialized
-    useEffect(() => {
-        setContract()
-    }, [Rarible])
+    //useEffect(() => {
+    //    setContract()
+    //}, [Rarible])
 
     // Edit metamask button if accounts are already available
     useEffect(() => {
@@ -101,15 +101,15 @@ function Canvas() {
         }
     }
 
-    // Function to set the contract instance and use web3 provided by metamask
-    const setContract = async () => {
-        RaribleContract = contract({abi: Rarible.abi})
-        RaribleContract.setProvider(web3.currentProvider)
-        _instance = await RaribleContract.at(
-            Rarible.address
-        )
-        setInstance(_instance)
-    }
+    //// Function to set the contract instance and use web3 provided by metamask
+    //const setContract = async () => {
+    //    RaribleContract = contract({abi: Rarible.abi})
+    //    RaribleContract.setProvider(web3.currentProvider)
+    //    _instance = await RaribleContract.at(
+    //        Rarible.address
+    //    )
+    //    setInstance(_instance)
+    //}
 
     // Function to enable Metamask when button is clicked
     const enableMetamask = async () => {
@@ -130,9 +130,9 @@ function Canvas() {
     }
 
     // Function to get balance from account with fetched tokenID
-    const _BalanceOf = tokenID => {
-        return instanceRe.balanceOf(accounts[0], tokenID)
-    }
+    //const _BalanceOf = tokenID => {
+    //    return instanceRe.balanceOf(accounts[0], tokenID)
+    //}
 
     return(
         <div className="canvas">
@@ -158,7 +158,7 @@ function Canvas() {
                     items={items}
                 />
             </div>
-            <ItemsContainer 
+            {/*<ItemsContainer 
                 args={
                     {
                         getURI: _getURI, 
@@ -168,7 +168,7 @@ function Canvas() {
                 }
                 ready={ready}
                 instance={instanceRe}
-            />
+            />*/}
         </div>
     )
 }
